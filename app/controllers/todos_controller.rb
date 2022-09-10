@@ -3,7 +3,7 @@ class TodosController < ApplicationController
 
   # GET /todos or /todos.json
   def index
-    @todos = Todo.all
+    @todos = Todo.in_order_of(:status, %w[incomplete complete])
   end
 
   # GET /todos/1 or /todos/1.json
@@ -52,6 +52,7 @@ class TodosController < ApplicationController
     @todo.destroy
 
     respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("#{helpers.dom_id(@todo)}_item") }
       format.html { redirect_to todos_url, notice: "Todo was successfully destroyed." }
       format.json { head :no_content }
     end
